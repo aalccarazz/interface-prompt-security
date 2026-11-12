@@ -1,0 +1,46 @@
+{
+  "name": "secnudge-demo",
+  "displayName": "SecNudge Demo",
+  "description": "Local mock prompt review and submission-nudge research prototype.",
+  "version": "0.0.3",
+  "publisher": "secnudge-research",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "vscode": "^1.85.0",
+    "node": ">=18"
+  },
+  "main": "./extension.cjs",
+  "categories": [
+    "Other"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.cjs",
+    "check": "node scripts/check.cjs",
+    "package": "node scripts/package.cjs",
+    "test:browser": "node test/browser.cjs"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "secnudge.review",
+        "title": "SecNudge: Review Prompt"
+      },
+      {
+        "command": "secnudge.enableClaudeHook",
+        "title": "SecNudge: Enable Claude Code Nudge"
+      },
+      {
+        "command": "secnudge.checkClaudeHook",
+        "title": "SecNudge: Check Claude Code Setup"
+      },
+      {
+        "command": "secnudge.disableClaudeHook",
+        "title": "SecNudge: Disable Claude Code Nudge"
+      }
+    ]
+  },
+  "devDependencies": {
+    "playwright": "^1.58.0"
+  }
+}

@@ -1,0 +1,4 @@
+dist/
+.claude/settings.local.json
+node_modules/
+.claude/settings.local.json.secnudge-backup
