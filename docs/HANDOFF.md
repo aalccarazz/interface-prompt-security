@@ -6,26 +6,29 @@
 - `integrations/secnudge` is a standalone VS Code extension (v0.0.3). The review panel supports editing, acceptance/dismissal/undo, revised previews, copying, and invalidation after prompt edits.
 - The extension also offers Enable Claude Code nudge, Check setup, and Disable commands. Enable installs a self-contained local hook in the selected project and preserves unrelated Claude settings.
 - The panel and hook share the integration's runtime-validated asynchronous adapter in `integrations/secnudge/analyzer.cjs`. The web app has a separate TypeScript adapter. The two apps are not yet consolidated into one shared backend package.
-- The Claude integration matches exactly one file-upload fixture. Reworded prompts bypass it. It is an interaction demo, not a predictor or security gate.
+- The Claude integration matches one file-upload fixture after trimming whitespace, removing one trailing `.`, `!`, or `?`, and ignoring case. Reworded prompts fall outside that fixture.
+- Both analyzers remain mocked while Chaoran connects the research backend. The [evaluation prompt pairs](EVALUATION_PROMPTS.md) cover the three web categories, an unsupported control, and the VS Code and Claude Code fixture.
 
 ## Verification
 
-Verified in the cloud workspace: 6 web-app tests, TypeScript/production build, 17 integration tests, integration syntax checks, browser checks using a simulated VS Code bridge, and extracted VSIX runtime installation/check/removal.
+The cloud rerun passed 6 web tests, the TypeScript/production build, 17 integration tests, syntax checks for 16 integration scripts, and the Chromium panel test with a simulated VS Code bridge. The packaged VSIX also passed archive validation and an extracted-runtime hook install, check, and removal.
 
-The user installed the extension in VS Code on macOS, opened the panel, enabled the hook for a sample project, and reported a passing local hook check. The full accept/copy flow in the real IDE and live Claude Code submission behavior have not been confirmed. Live Claude testing is blocked on the user's Claude access; no subscription or API credentials are included.
+All four web pairs were checked in Chromium, including the edit, accept, dismiss, undo, copy, and invalidation flows for the supported pairs. The documented Claude pair produced a block for the baseline and no block decision for the revision when run through the local hook command.
 
-## What Chaoran can test
+The extension was installed in VS Code on macOS, and the panel opened and passed the local setup check for a sample project. Chaoran confirmed that real Claude Code blocks submission of `Build an endpoint to upload files`. **Revised-prompt submission remains unconfirmed in real Claude Code.** The full accept/copy flow in the real IDE also remains unconfirmed.
+
+## Remaining live checks
 
 1. Check out this branch and open `integrations/secnudge`.
 2. Run `npm run package` (Node 18+) to create `dist/secnudge-demo-0.0.3.vsix`, then install it through VS Code's **Extensions: Install from VSIX…** command. No npm install is needed for packaging or the extension runtime.
 3. Run **SecNudge: Review Prompt** from the Command Palette.
 4. Choose **Enable Claude Code nudge…** and select this repository's `examples/claude-upload` folder. Choose that same folder for **Check setup…**.
 5. With eligible Claude Code access, open `examples/claude-upload` as the project and start a new Claude Code session. Confirm **UserPromptSubmit** via `/hooks`.
-6. Submit exactly `Build an endpoint to upload files`. Record whether the SecNudge block reason appears before Claude proceeds. No screenshot or transcript containing sensitive prompts is needed; use only this fixture.
-7. Manually resubmit the revised example in `TASK.md` and confirm it proceeds. That only verifies the exact-match bypass behavior, not whether a security requirement was understood.
+6. To reproduce the confirmed block in the same session, submit `Build an endpoint to upload files` exactly as written and record whether the SecNudge reason appears.
+7. Manually submit the [revised example](../examples/claude-upload/TASK.md#revised-example) and record whether Claude Code proceeds. This checks how the live client handles text outside the mock fixture.
 8. Disable the nudge for the same folder and restart Claude Code. Confirm unrelated hooks still exist.
 
-Report the Claude Code version/client (CLI or VS Code), whether the hook was visible, whether the fixture blocked, whether the revised prompt proceeded, and any generic error text. Also exercise accept/edit/dismiss/undo and clipboard behavior in the actual VS Code panel.
+Report the Claude Code client (CLI or VS Code) and version, hook visibility, the revised submission outcome, and any generic error text. Use the supplied synthetic fixture for the live check. Also exercise accept, edit, dismiss, undo, and clipboard behavior in the actual VS Code panel.
 
 ## What is needed for the research backend
 
